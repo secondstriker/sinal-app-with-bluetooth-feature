@@ -14,11 +14,12 @@ import androidx.core.app.ActivityOptionsCompat;
 
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.R;
+import org.thoughtcrime.securesms.bluetooth.BluetoothConversationActivity;
 import org.thoughtcrime.securesms.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.ExecutionException;
 
-public class ConversationPopupActivity extends ConversationActivity {
+public class ConversationPopupActivity extends BluetoothConversationActivity {
 
   private static final String TAG = Log.tag(ConversationPopupActivity.class);
 

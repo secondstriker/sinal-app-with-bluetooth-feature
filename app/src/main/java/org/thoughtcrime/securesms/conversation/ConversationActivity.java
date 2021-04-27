@@ -84,7 +84,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.button.MaterialButton;
-import com.zjh.btim.Activity.BluetoothConnectionActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -106,8 +105,6 @@ import org.thoughtcrime.securesms.VerifyIdentityActivity;
 import org.thoughtcrime.securesms.attachments.Attachment;
 import org.thoughtcrime.securesms.attachments.TombstoneAttachment;
 import org.thoughtcrime.securesms.audio.AudioRecorder;
-import org.thoughtcrime.securesms.bluetooth.BluetoothSender;
-import org.thoughtcrime.securesms.bluetooth.BluetoothSenderImpl;
 import org.thoughtcrime.securesms.components.AnimatingToggle;
 import org.thoughtcrime.securesms.components.ComposeText;
 import org.thoughtcrime.securesms.components.ConversationSearchBottomBar;
@@ -311,7 +308,7 @@ import static org.thoughtcrime.securesms.database.GroupDatabase.GroupRecord;
  *
  */
 @SuppressLint("StaticFieldLeak")
-public class ConversationActivity extends PassphraseRequiredActivity
+public abstract class ConversationActivity extends PassphraseRequiredActivity
     implements ConversationFragment.ConversationFragmentListener,
                AttachmentManager.AttachmentListener,
                OnKeyboardShownListener,
@@ -2789,18 +2786,6 @@ public class ConversationActivity extends PassphraseRequiredActivity
     }
   }
 
-  private void sendTextViaBluetooth(){
-      BluetoothSender sender = new BluetoothSenderImpl();
-      if(sender.isUserPaired("1")){
-          sender.send("hello developer");
-      }
-      else{
-            Intent intent = new Intent(this, BluetoothConnectionActivity.class);
-            startActivity(intent);
-
-      }
-  }
-
   private void sendMediaMessage(@NonNull MediaSendActivityResult result) {
     long                 thread        = this.threadId;
     long                 expiresIn     = recipient.get().getExpireMessages() * 1000L;
@@ -2915,6 +2900,7 @@ public class ConversationActivity extends PassphraseRequiredActivity
 
     return future;
   }
+
 
   private void sendTextMessage(final boolean forceSms, final long expiresIn, final int subscriptionId, final boolean initiating)
       throws InvalidMessageException
@@ -3815,4 +3801,6 @@ public class ConversationActivity extends PassphraseRequiredActivity
       this.hasTransparency = hasTransparency;
     }
   }
+
+    public abstract void sendTextViaBluetooth();
 }

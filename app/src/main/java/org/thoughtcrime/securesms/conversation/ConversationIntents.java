@@ -7,6 +7,7 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.thoughtcrime.securesms.bluetooth.BluetoothConversationActivity;
 import org.thoughtcrime.securesms.database.ThreadDatabase;
 import org.thoughtcrime.securesms.mediasend.Media;
 import org.thoughtcrime.securesms.recipients.Recipient;
@@ -159,7 +160,7 @@ public class ConversationIntents {
 
   public final static class Builder {
     private final Context                               context;
-    private final Class<? extends ConversationActivity> conversationActivityClass;
+    private final Class<? extends BluetoothConversationActivity> conversationActivityClass;
     private final RecipientId                           recipientId;
     private final long                                  threadId;
 
@@ -177,11 +178,11 @@ public class ConversationIntents {
                     @NonNull RecipientId recipientId,
                     long threadId)
     {
-      this(context, ConversationActivity.class, recipientId, threadId);
+      this(context, BluetoothConversationActivity.class, recipientId, threadId);
     }
 
     private Builder(@NonNull Context context,
-                    @NonNull Class<? extends ConversationActivity> conversationActivityClass,
+                    @NonNull Class<? extends BluetoothConversationActivity> conversationActivityClass,
                     @NonNull RecipientId recipientId,
                     long threadId)
     {
