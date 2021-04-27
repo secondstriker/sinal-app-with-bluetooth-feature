@@ -84,6 +84,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.button.MaterialButton;
+import com.zjh.btim.Activity.BluetoothConnectionActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -2771,14 +2772,8 @@ public class ConversationActivity extends PassphraseRequiredActivity
         sendMediaMessage(forceSms, expiresIn, false, subscriptionId, initiating);
       } else {
           if(transport.isBluetooth()){
-              BluetoothSender sender = new BluetoothSenderImpl();
-              if(sender.isUserPaired("1")){
-                  sender.send("fsfds");
-              }
-              else{
-                  Toast.makeText(this, getString(R.string.bluetooth_not_connection_message), Toast.LENGTH_LONG).show();
-              }
-          }else {
+              sendTextViaBluetooth();
+          } else {
               sendTextMessage(forceSms, expiresIn, subscriptionId, initiating);
           }
       }
@@ -2792,6 +2787,18 @@ public class ConversationActivity extends PassphraseRequiredActivity
                      Toast.LENGTH_SHORT).show();
       Log.w(TAG, ex);
     }
+  }
+
+  private void sendTextViaBluetooth(){
+      BluetoothSender sender = new BluetoothSenderImpl();
+      if(sender.isUserPaired("1")){
+          sender.send("hello developer");
+      }
+      else{
+            Intent intent = new Intent(this, BluetoothConnectionActivity.class);
+            startActivity(intent);
+
+      }
   }
 
   private void sendMediaMessage(@NonNull MediaSendActivityResult result) {
