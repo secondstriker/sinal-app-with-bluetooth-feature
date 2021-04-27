@@ -236,6 +236,7 @@
     <string name="ConversationActivity_transport_insecure_sms">Insecure SMS</string>
     <string name="ConversationActivity_transport_insecure_mms">Insecure MMS</string>
     <string name="ConversationActivity_transport_signal">Signal</string>
+    <string name="ConversationActivity_transport_bluetooth">Via Bluetooth</string>
     <string name="ConversationActivity_lets_switch_to_signal">Let\'s switch to Signal %1$s</string>
     <string name="ConversationActivity_specify_recipient">Please choose a contact</string>
     <string name="ConversationActivity_unblock">Unblock</string>
@@ -1838,6 +1839,7 @@
 
     <!-- conversation_activity -->
     <string name="conversation_activity__type_message_push">Signal message</string>
+    <string name="conversation_activity__type_message_bluetooth">Via Bluetooth</string>
     <string name="conversation_activity__type_message_sms_insecure">Unsecured SMS</string>
     <string name="conversation_activity__type_message_mms_insecure">Unsecured MMS</string>
     <string name="conversation_activity__from_sim_name">From %1$s</string>
@@ -3333,6 +3335,7 @@
     <string name="CanNotSendPaymentDialog__cant_send_payment">Can\'t send payment</string>
     <string name="CanNotSendPaymentDialog__to_send_a_payment_to_this_user">To send a payment to this user they need to accept a message request from you. Send them a message to create a message request.</string>
     <string name="CanNotSendPaymentDialog__send_a_message">Send a message</string>
+    <string name="bluetooth_not_connection_message">This user is not connected via bluetooth.</string>
 
     <!-- EOF -->
 

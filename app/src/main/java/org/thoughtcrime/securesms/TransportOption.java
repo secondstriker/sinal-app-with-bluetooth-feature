@@ -13,7 +13,7 @@ import org.whispersystems.libsignal.util.guava.Optional;
 
 public class TransportOption implements Parcelable {
 
-  public enum Type {
+    public enum Type {
     SMS,
     TEXTSECURE
   }
@@ -26,6 +26,7 @@ public class TransportOption implements Parcelable {
   private final @NonNull CharacterCalculator    characterCalculator;
   private final @NonNull Optional<CharSequence> simName;
   private final @NonNull Optional<Integer>      simSubscriptionId;
+  private Boolean isBluetooth = false;
 
   public TransportOption(@NonNull  Type type,
                          @DrawableRes int drawable,
@@ -78,6 +79,14 @@ public class TransportOption implements Parcelable {
 
   public boolean isSms() {
     return type == Type.SMS;
+  }
+
+  public boolean isBluetooth() {
+    return isBluetooth;
+  }
+
+  public void setIsBluetooth(boolean isBluetooth) {
+    this.isBluetooth = isBluetooth;
   }
 
   public CharacterState calculateCharacters(String messageBody) {

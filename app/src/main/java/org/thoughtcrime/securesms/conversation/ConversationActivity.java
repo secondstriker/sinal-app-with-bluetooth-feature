@@ -105,6 +105,8 @@ import org.thoughtcrime.securesms.VerifyIdentityActivity;
 import org.thoughtcrime.securesms.attachments.Attachment;
 import org.thoughtcrime.securesms.attachments.TombstoneAttachment;
 import org.thoughtcrime.securesms.audio.AudioRecorder;
+import org.thoughtcrime.securesms.bluetooth.BluetoothSender;
+import org.thoughtcrime.securesms.bluetooth.BluetoothSenderImpl;
 import org.thoughtcrime.securesms.components.AnimatingToggle;
 import org.thoughtcrime.securesms.components.ComposeText;
 import org.thoughtcrime.securesms.components.ConversationSearchBottomBar;
@@ -2768,7 +2770,17 @@ public class ConversationActivity extends PassphraseRequiredActivity
       } else if (isMediaMessage) {
         sendMediaMessage(forceSms, expiresIn, false, subscriptionId, initiating);
       } else {
-        sendTextMessage(forceSms, expiresIn, subscriptionId, initiating);
+          if(transport.isBluetooth()){
+              BluetoothSender sender = new BluetoothSenderImpl();
+              if(sender.isUserPaired("1")){
+                  sender.send("fsfds");
+              }
+              else{
+                  Toast.makeText(this, getString(R.string.bluetooth_not_connection_message), Toast.LENGTH_LONG).show();
+              }
+          }else {
+              sendTextMessage(forceSms, expiresIn, subscriptionId, initiating);
+          }
       }
     } catch (RecipientFormattingException ex) {
       Toast.makeText(ConversationActivity.this,

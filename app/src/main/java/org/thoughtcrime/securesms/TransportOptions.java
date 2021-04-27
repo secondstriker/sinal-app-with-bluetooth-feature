@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.signal.core.util.logging.Log;
+import org.thoughtcrime.securesms.bluetooth.BluetoothTransportOptions;
 import org.thoughtcrime.securesms.permissions.Permissions;
 import org.thoughtcrime.securesms.util.CharacterCalculator;
 import org.thoughtcrime.securesms.util.MmsCharacterCalculator;
@@ -159,7 +160,10 @@ public class TransportOptions {
   private List<TransportOption> initializeAvailableTransports(boolean isMediaMessage) {
     List<TransportOption> results = new LinkedList<>();
 
-    if (isMediaMessage) {
+    if(!isMediaMessage)
+        results.add(BluetoothTransportOptions.getBluetoothTransportOption(context));
+
+      if (isMediaMessage) {
       results.addAll(getTransportOptionsForSimCards(context.getString(R.string.ConversationActivity_transport_insecure_mms),
                                                     context.getString(R.string.conversation_activity__type_message_mms_insecure),
                                                     new MmsCharacterCalculator()));
