@@ -49,7 +49,7 @@ public class BluetoothConversationActivity extends ConversationActivity {
     private BluetoothUtil bluetoothUtil;
     private BluetoothStateBroadcastReceive broadcastReceive;
 
-    private BlueToothInterface blueToothInterface = new BlueToothInterface() {
+    private final BlueToothInterface blueToothInterface = new BlueToothInterface() {
         @Override
         public void getBlueToothDevices(BluetoothDevice device) {
 

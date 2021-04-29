@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 public class BluetoothUtil {
 
     private Context context;
@@ -36,6 +38,7 @@ public class BluetoothUtil {
     public void openBluetooth() {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
