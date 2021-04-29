@@ -73,7 +73,6 @@ import org.thoughtcrime.securesms.util.ParcelUtil;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 import org.whispersystems.libsignal.util.guava.Optional;
 import org.whispersystems.libsignal.util.guava.Preconditions;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,6 +111,25 @@ public class MessageSender {
     onMessageSent();
 
     return allocatedThreadId;
+  }
+
+  public static long saveSentBluetoothMessage(final Context context,
+                                              final OutgoingTextMessage message,
+                                              final long threadId,
+                                              final SmsDatabase.InsertListener insertListener) {
+
+
+      Log.i(TAG, "Sending text message to " + message.getRecipient().getId() + ", thread: " + threadId);
+      MessageDatabase database    = DatabaseFactory.getSmsDatabase(context);
+      Recipient       recipient   = message.getRecipient();
+
+      long allocatedThreadId = DatabaseFactory.getThreadDatabase(context).getOrCreateValidThreadId(recipient, threadId);
+      long messageId         = database.insertMessageOutbox(allocatedThreadId, message, true, System.currentTimeMillis(), insertListener);
+
+      DatabaseFactory.getSmsDatabase(context).markAsSent(messageId, true);
+      onMessageSent();
+
+      return allocatedThreadId;
   }
 
   public static long send(final Context context,

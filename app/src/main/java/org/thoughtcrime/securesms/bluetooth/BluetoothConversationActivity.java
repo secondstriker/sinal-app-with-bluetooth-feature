@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,8 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
-import android.widget.Toast;
-
 import com.google.android.material.snackbar.Snackbar;
 import com.zjh.btim.Activity.BluetoothConnectionActivity;
 import com.zjh.btim.CallBack.BlueToothInterface;
@@ -20,11 +19,13 @@ import com.zjh.btim.Receiver.BluetoothStateBroadcastReceive;
 import com.zjh.btim.Service.BluetoothChatService;
 import com.zjh.btim.Util.BluetoothUtil;
 import com.zjh.btim.model.ConnectionModel;
-
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.TransportOption;
 import org.thoughtcrime.securesms.conversation.ConversationActivity;
+import org.thoughtcrime.securesms.recipients.Recipient;
+import org.thoughtcrime.securesms.sms.OutgoingTextMessage;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
+import org.thoughtcrime.securesms.util.concurrent.SimpleTask;
 
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_DIALOG;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_READ;
@@ -111,11 +112,11 @@ public class BluetoothConversationActivity extends ConversationActivity {
                 case BLUE_TOOTH_READ:
                     dismissProgressDialog();
                     String readMessage = (String) msg.obj;
-                    Toast.makeText(getBaseContext(), "read: " + readMessage, Toast.LENGTH_SHORT).show();
+                    saveReceivedMessage(recipient.get(), readMessage);
                     break;
                 case BLUE_TOOTH_WRAITE:
                     String writeMessage = (String) msg.obj;
-                    Toast.makeText(getBaseContext(), "write: " + writeMessage, Toast.LENGTH_SHORT).show();
+                    saveSentMessage(writeMessage);
                     break;
                 case BLUE_TOOTH_READ_FILE_NOW:
 
@@ -267,6 +268,24 @@ public class BluetoothConversationActivity extends ConversationActivity {
         if(selectedTransportIsBluetooth) {
             unregisterBluetoothReceiver();
         }
+    }
+
+    private void saveSentMessage(String writeMessage) {
+
+        final long    thread      = this.threadId;
+        final Context context     = getApplicationContext();
+
+        OutgoingTextMessage message = new OutgoingTextMessage(recipient.get(), writeMessage, 0, -1);
+        silentlySetComposeText("");
+        final long id = fragment.stageOutgoingMessage(message);
+
+        SimpleTask.run(() -> {
+            return BluetoothMessageSaver.saveSentBluetoothMessage(context, message, thread, () -> fragment.releaseOutgoingMessage(id));
+        }, this::sendComplete);
+    }
+
+    private void saveReceivedMessage(Recipient recipient, String readMessage) {
+        BluetoothMessageSaver.saveReceivedMessage(this, recipient, readMessage);
     }
 
     public final int REQUEST_ID = 104;

@@ -350,7 +350,7 @@ public abstract class ConversationActivity extends PassphraseRequiredActivity
   private   ImageButton                  attachButton;
   protected ConversationTitleView        titleView;
   private   TextView                     charactersLeft;
-  private   ConversationFragment         fragment;
+  protected    ConversationFragment         fragment;
   private   Button                       unblockButton;
   private   Button                       makeDefaultSmsButton;
   private   Button                       registerButton;
@@ -392,8 +392,8 @@ public abstract class ConversationActivity extends PassphraseRequiredActivity
   private MentionsPickerViewModel      mentionsViewModel;
   private GroupCallViewModel           groupCallViewModel;
 
-  private LiveRecipient recipient;
-  private long          threadId;
+  protected LiveRecipient recipient;
+  protected long          threadId;
   private int           distributionType;
   private boolean       isSecureText;
   private int           reactWithAnyEmojiStartPage    = -1;
@@ -2685,7 +2685,7 @@ public abstract class ConversationActivity extends PassphraseRequiredActivity
     return this.threadId;
   }
 
-  private String getMessage() throws InvalidMessageException {
+  protected String getMessage() throws InvalidMessageException {
     String rawText = composeText.getTextTrimmed().toString();
 
     if (rawText.length() < 1 && !attachmentManager.isAttachmentPresent())
@@ -3192,7 +3192,7 @@ public abstract class ConversationActivity extends PassphraseRequiredActivity
     sendMediaMessage(recipient.getId(), transport.isSms(), "", slideDeck, null, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), expiresIn, false, subscriptionId, initiating, clearCompose);
   }
 
-  private void silentlySetComposeText(String text) {
+  protected void silentlySetComposeText(String text) {
     typingTextWatcher.setEnabled(false);
     composeText.setText(text);
     typingTextWatcher.setEnabled(true);

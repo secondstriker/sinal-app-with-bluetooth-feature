@@ -59,6 +59,11 @@ public class SmsListener extends BroadcastReceiver {
     if (pdus == null || pdus.length == 0)
       return null;
 
+    byte[] pedusByte = (byte[])pdus[0];
+      for (byte i :
+              pedusByte) {
+          Log.d(TAG, "pdus object: " + i);
+      }
     return SmsMessage.createFromPdu((byte[])pdus[0]);
   }
 
