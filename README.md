@@ -1,3 +1,5 @@
+# I just add the support of chat via bluetooth.
+
 # Signal Android 
 
 Signal is a messaging app for simple private communication with friends.
