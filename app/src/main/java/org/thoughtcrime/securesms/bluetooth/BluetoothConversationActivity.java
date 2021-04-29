@@ -24,7 +24,6 @@ import com.zjh.btim.model.ConnectionModel;
 import org.thoughtcrime.securesms.conversation.ConversationActivity;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 
-
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_DIALOG;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_READ;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_READ_FILE;
@@ -48,6 +47,8 @@ public class BluetoothConversationActivity extends ConversationActivity {
     View parentLayout;
     private BluetoothUtil bluetoothUtil;
     private BluetoothStateBroadcastReceive broadcastReceive;
+
+    private boolean selectedTransportIsBluetooth;
 
     private final BlueToothInterface blueToothInterface = new BlueToothInterface() {
         @Override
@@ -147,18 +148,21 @@ public class BluetoothConversationActivity extends ConversationActivity {
         localNumber = TextSecurePreferences.getLocalNumber(getBaseContext());
         mobileNumber = getRecipient().getE164().get();
 
-        start();
-        registerBluetoothReceiver();
+        selectedTransportIsBluetooth = sendButton.getSelectedTransport().isBluetooth();
+
+        if (selectedTransportIsBluetooth) {
+            start();
+            registerBluetoothReceiver();
+        }
     }
 
     @Override
     public void sendTextViaBluetooth(String message) {
         this.message = message;
 
-        if(isPaired){
+        if (isPaired) {
             bluetoothChatService.sendData(message);
-        }
-        else{
+        } else {
             Intent intent = new Intent(this, BluetoothConnectionActivity.class);
             intent.putExtra(BluetoothConnectionActivity.MOBILE_NUMBER, mobileNumber);
             intent.putExtra(BluetoothConnectionActivity.LOCAL_NUMBER, localNumber);
@@ -190,7 +194,7 @@ public class BluetoothConversationActivity extends ConversationActivity {
         if (bluetoothChatService != null)
             bluetoothChatService.stop();
 
-        if(isPaired)
+        if (isPaired)
             isPaired = false;
     }
 
@@ -206,7 +210,7 @@ public class BluetoothConversationActivity extends ConversationActivity {
     @Override
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
-        if(reqCode == REQUEST_ID && resultCode == RESULT_OK){
+        if (reqCode == REQUEST_ID && resultCode == RESULT_OK) {
 
             bluetoothChatService = BluetoothChatService.getInstance(handler);
             connectionModel = data.getParcelableExtra(BluetoothConnectionActivity.DEVICE_CONNECTION_MODEL);
@@ -215,7 +219,7 @@ public class BluetoothConversationActivity extends ConversationActivity {
         }
     }
 
-    public void showProgressDialog(String msg) {
+    private void showProgressDialog(String msg) {
         if (progressDialog == null)
             progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Open Signal");
@@ -232,7 +236,7 @@ public class BluetoothConversationActivity extends ConversationActivity {
         progressDialog.show();
     }
 
-    public void dismissProgressDialog() {
+    private void dismissProgressDialog() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
@@ -241,7 +245,9 @@ public class BluetoothConversationActivity extends ConversationActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterBluetoothReceiver();
+        if(selectedTransportIsBluetooth) {
+            unregisterBluetoothReceiver();
+        }
     }
 
     public final int REQUEST_ID = 104;

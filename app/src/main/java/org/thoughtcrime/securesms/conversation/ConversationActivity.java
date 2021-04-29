@@ -346,7 +346,7 @@ public abstract class ConversationActivity extends PassphraseRequiredActivity
   private   GlideRequests                glideRequests;
   protected ComposeText                  composeText;
   private   AnimatingToggle              buttonToggle;
-  private   SendButton                   sendButton;
+  protected SendButton                   sendButton;
   private   ImageButton                  attachButton;
   protected ConversationTitleView        titleView;
   private   TextView                     charactersLeft;

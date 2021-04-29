@@ -24,7 +24,8 @@
         <activity
             android:name=".Activity.BluetoothConnectionActivity"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity">
+            tools:ignore="LockedOrientationActivity"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
         </activity>
     </application>
 

@@ -30,16 +30,10 @@
         android:orientation="vertical"
         android:visibility="invisible">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/bg_home" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bluetooth is not open"
+            android:text="Bluetooth is not turned on"
             android:textColor="#707070" />
     </LinearLayout>
 
