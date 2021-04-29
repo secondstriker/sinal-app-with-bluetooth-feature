@@ -21,6 +21,7 @@ import com.zjh.btim.Service.BluetoothChatService;
 import com.zjh.btim.Util.BluetoothUtil;
 import com.zjh.btim.model.ConnectionModel;
 
+import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.TransportOption;
 import org.thoughtcrime.securesms.conversation.ConversationActivity;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
@@ -155,17 +156,6 @@ public class BluetoothConversationActivity extends ConversationActivity {
             start();
             registerBluetoothReceiver();
         }
-
-        sendButton.addOnTransportChangedListener((TransportOption newTransport, boolean manuallySelected) -> {
-
-            if (!newTransport.isBluetooth()) {
-                unregisterBluetoothReceiver();
-                bluetoothUtil.disableBluetooth();
-            } else {
-                start();
-                registerBluetoothReceiver();
-            }
-        });
     }
 
     @Override
@@ -179,6 +169,20 @@ public class BluetoothConversationActivity extends ConversationActivity {
             intent.putExtra(BluetoothConnectionActivity.MOBILE_NUMBER, mobileNumber);
             intent.putExtra(BluetoothConnectionActivity.LOCAL_NUMBER, localNumber);
             startActivityForResult(intent, REQUEST_ID);
+        }
+    }
+    @Override
+    public void onTransportChanged(TransportOption newTransport, boolean manuallySelected) {
+        if(!manuallySelected) return;
+        Log.d(TAG, "onTransportChanged: type: " + newTransport.getType() + " isBluetooth: " + newTransport.isBluetooth() + " manuallySelected: " + manuallySelected);
+        bluetoothUtil = new BluetoothUtil(getBaseContext());
+        if (newTransport.isType(TransportOption.Type.TEXTSECURE) && newTransport.isBluetooth()) {
+            start();
+            registerBluetoothReceiver();
+        } else {
+            unregisterBluetoothReceiver();
+            if(bluetoothUtil != null)
+                bluetoothUtil.disableBluetooth();
         }
     }
 
@@ -202,7 +206,10 @@ public class BluetoothConversationActivity extends ConversationActivity {
             getBaseContext().unregisterReceiver(broadcastReceive);
             broadcastReceive = null;
         }
-        bluetoothUtil.close();
+
+        if(bluetoothUtil != null)
+            bluetoothUtil.close();
+
         if (bluetoothChatService != null)
             bluetoothChatService.stop();
 
@@ -263,4 +270,5 @@ public class BluetoothConversationActivity extends ConversationActivity {
     }
 
     public final int REQUEST_ID = 104;
+    private final String TAG = this.getClass().getSimpleName();
 }

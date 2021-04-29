@@ -2021,6 +2021,7 @@ public abstract class ConversationActivity extends PassphraseRequiredActivity
       buttonToggle.getBackground().invalidateSelf();
 
       if (manuallySelected) recordTransportPreference(newTransport);
+      onTransportChanged(newTransport, manuallySelected);
     });
 
     titleView.setOnClickListener(v -> handleConversationSettings());
@@ -3803,4 +3804,5 @@ public abstract class ConversationActivity extends PassphraseRequiredActivity
   }
 
     public abstract void sendTextViaBluetooth(String message);
+    public abstract void onTransportChanged(TransportOption newTransport, boolean manuallySelected);
 }
