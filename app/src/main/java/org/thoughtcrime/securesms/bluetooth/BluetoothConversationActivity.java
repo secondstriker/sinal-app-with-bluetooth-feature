@@ -21,6 +21,7 @@ import com.zjh.btim.Service.BluetoothChatService;
 import com.zjh.btim.Util.BluetoothUtil;
 import com.zjh.btim.model.ConnectionModel;
 
+import org.thoughtcrime.securesms.TransportOption;
 import org.thoughtcrime.securesms.conversation.ConversationActivity;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 
@@ -154,6 +155,17 @@ public class BluetoothConversationActivity extends ConversationActivity {
             start();
             registerBluetoothReceiver();
         }
+
+        sendButton.addOnTransportChangedListener((TransportOption newTransport, boolean manuallySelected) -> {
+
+            if (!newTransport.isBluetooth()) {
+                unregisterBluetoothReceiver();
+                bluetoothUtil.disableBluetooth();
+            } else {
+                start();
+                registerBluetoothReceiver();
+            }
+        });
     }
 
     @Override
