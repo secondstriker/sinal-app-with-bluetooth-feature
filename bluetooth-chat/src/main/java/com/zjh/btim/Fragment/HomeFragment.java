@@ -42,6 +42,7 @@ import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_DIALO
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_READ;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_SUCCESS;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_TOAST;
+import static com.zjh.btim.Activity.BluetoothConnectionActivity.DEVICE_CONNECTION_KEY;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.DEVICE_CONNECTION_MODEL;
 
 
@@ -116,8 +117,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     break;
                 case BLUE_TOOTH_TOAST:
                     dismissProgressDialog();
-                    Snackbar.make(getView(), (String) msg.obj, Snackbar.LENGTH_LONG)
-                    .setBackgroundTint(getContext().getResources().getColor(R.color.white)).show();
+                    Snackbar.make(getView(), (String) msg.obj, Snackbar.LENGTH_LONG).show();
                     break;
                 case BLUE_TOOTH_READ:
                     dismissProgressDialog();
@@ -126,8 +126,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     if(mobileStr == null)
                         throw new IllegalStateException("mobileStr should not be null");
 
-                    if(!mobileStr.equals(mobileNumber)){
-                        Toast.makeText(getContext(), "This device is not the user's device, try another one.", Toast.LENGTH_LONG).show();
+                    if(mobileStr.contains(DEVICE_CONNECTION_KEY) && !mobileStr.substring(DEVICE_CONNECTION_KEY.length()).equals(mobileNumber)){
+                        Snackbar.make(getView(), "This device is not the user's device, try another one.", Snackbar.LENGTH_LONG).show();
                         break;
                     }
 
@@ -140,8 +140,9 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     BluetoothDevice remoteDevice = (BluetoothDevice) msg.obj;
                     connectionModel = new ConnectionModel(mobileNumber,
                             remoteDevice.getAddress(), remoteDevice.getName());
-
-                    mBluetoothChatService.sendData(localNumber);
+                    //we send a connection key with phone number to check and avoid printing
+                    //it in the chat
+                    mBluetoothChatService.sendData(DEVICE_CONNECTION_KEY + localNumber);
                     break;
             }
         }

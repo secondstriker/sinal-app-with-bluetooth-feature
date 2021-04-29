@@ -25,6 +25,8 @@ public class BluetoothConnectionActivity extends AppCompatActivity {
     public static final String MOBILE_NUMBER = "mobile_number";
     public static final String LOCAL_NUMBER = "local_number";
     public static final String DEVICE_CONNECTION_MODEL = "device_connection_model";
+    public static final String DEVICE_CONNECTION_KEY = "SVSGE5VV=)(=MCNO3FDS";
+
 
     private String mobileNumber;
     private String localNumber;

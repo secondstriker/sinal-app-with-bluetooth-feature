@@ -36,6 +36,7 @@ import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_TOAST
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_WRAITE;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_WRAITE_FILE;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_WRAITE_FILE_NOW;
+import static com.zjh.btim.Activity.BluetoothConnectionActivity.DEVICE_CONNECTION_KEY;
 
 public class BluetoothConversationActivity extends ConversationActivity {
 
@@ -98,24 +99,27 @@ public class BluetoothConversationActivity extends ConversationActivity {
                     break;
                 case BLUE_TOOTH_TOAST:
                     dismissProgressDialog();
-                    Snackbar.make(parentLayout, (String) msg.obj, Snackbar.LENGTH_LONG)
-                            .setBackgroundTint(getResources().getColor(com.zjh.btim.R.color.white)).show();
+                    Snackbar.make(parentLayout, (String) msg.obj, Snackbar.LENGTH_LONG).show();
                     break;
                 case BLUE_TOOTH_SUCCESS:
                     BluetoothDevice remoteDevice = (BluetoothDevice) msg.obj;
                     connectionModel = new ConnectionModel(mobileNumber,
                             remoteDevice.getAddress(), remoteDevice.getName());
 
-                    bluetoothChatService.sendData(localNumber);
+                    //we send a connection key with phone number to check and avoid printing
+                    //it in the chat
+                    bluetoothChatService.sendData(DEVICE_CONNECTION_KEY + localNumber);
                     isPaired = true;
                     break;
                 case BLUE_TOOTH_READ:
                     dismissProgressDialog();
                     String readMessage = (String) msg.obj;
+                    if(readMessage.contains(DEVICE_CONNECTION_KEY)) break;
                     saveReceivedMessage(recipient.get(), readMessage);
                     break;
                 case BLUE_TOOTH_WRAITE:
                     String writeMessage = (String) msg.obj;
+                    if(writeMessage.contains(DEVICE_CONNECTION_KEY)) break;
                     saveSentMessage(writeMessage);
                     break;
                 case BLUE_TOOTH_READ_FILE_NOW:
