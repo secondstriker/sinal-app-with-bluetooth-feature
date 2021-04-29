@@ -70,7 +70,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             super.handleMessage(msg);
             switch (msg.what) {
                 case BLUE_TOOTH_TOAST:
-                    Snackbar.make(et_write, (String) msg.obj, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(et_write, (String) msg.obj, Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(getResources().getColor(R.color.white)).show();
                     Timer timer = new Timer();
                     TimerTask tast = new TimerTask() {
                         @Override
@@ -99,13 +100,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case BLUE_TOOTH_READ_FILE_NOW:
                     Log.i("zjh蓝牙文件传输", msg.obj + "");
-                    Snackbar.make(et_write, (String) msg.obj, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(et_write, (String) msg.obj, Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(getResources().getColor(R.color.white)).show();
                     break;
                 case BLUE_TOOTH_WRAITE_FILE_NOW:
                     Log.i("zjh蓝牙文件传输", msg.obj + "");
                     if (msg.obj.toString().equals("File sending failed")) {
                         dialog.dismiss();
-                        Snackbar.make(et_write, (String) msg.obj, Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(et_write, (String) msg.obj, Snackbar.LENGTH_LONG)
+                                .setBackgroundTint(getResources().getColor(R.color.white)).show();
                     } else {
                         dialog.setMessage(msg.obj + "");
                         dialog.setCancelable(false);
@@ -266,7 +269,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void send() {
         String write = et_write.getText().toString().trim();
         if (TextUtils.isEmpty(write)) {
-            Snackbar.make(et_write, "Send content can't be empty", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(et_write, "Send content can't be empty", Snackbar.LENGTH_LONG)
+                    .setBackgroundTint(getResources().getColor(R.color.white)).show();
             return;
         }
         bluetoothChatService.sendData(write);
@@ -287,7 +291,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onPermissionDenied() {
                         //权限获取失败
-                        Snackbar.make(et_write, "Please manually give relevant permissions", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(et_write, "Please manually give relevant permissions", Snackbar.LENGTH_LONG)
+                                .setBackgroundTint(getResources().getColor(R.color.white)).show();
                     }
                 });
     }

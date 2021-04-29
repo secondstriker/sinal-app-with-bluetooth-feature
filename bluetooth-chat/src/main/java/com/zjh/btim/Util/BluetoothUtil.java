@@ -7,6 +7,8 @@ import android.content.Intent;
 
 import com.zjh.btim.Bean.BlueToothBean;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -70,6 +72,24 @@ public class BluetoothUtil {
 
     public void close(){
         bluetoothAdapter.cancelDiscovery();
+    }
+
+    public String getBluetoothMacAddress() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        String bluetoothMacAddress = "";
+        try {
+            Field mServiceField = bluetoothAdapter.getClass().getDeclaredField("mService");
+            mServiceField.setAccessible(true);
+
+            Object btManagerService = mServiceField.get(bluetoothAdapter);
+
+            if (btManagerService != null) {
+                bluetoothMacAddress = (String) btManagerService.getClass().getMethod("getAddress").invoke(btManagerService);
+            }
+        } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ignore) {
+
+        }
+        return bluetoothMacAddress;
     }
 
 }

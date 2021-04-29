@@ -28,10 +28,16 @@ public class BluetoothConnectionActivity extends AppCompatActivity {
     public static final int BLUE_TOOTH_WRAITE_FILE = 0X555;
     public static final int BLUE_TOOTH_READ_FILE = 0X888;
     public static final int BLUE_TOOTH_SUCCESS = 0x444;
+    public static final String MOBILE_NUMBER = "mobile_number";
+    public static final String LOCAL_NUMBER = "local_number";
+    public static final String DEVICE_CONNECTION_MODEL = "device_connection_model";
+
 
     private ViewPager viewPager;
     private MenuItem menuItem;
     private BottomNavigationView bottomNavigationView;
+    private String mobileNumber;
+    private String localNumber;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -51,7 +57,14 @@ public class BluetoothConnectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTitle("Bluetooth instant messaging App");
+        // setTitle("Bluetooth instant messaging App");
+        mobileNumber = getIntent().getStringExtra(MOBILE_NUMBER);
+        localNumber = getIntent().getStringExtra(LOCAL_NUMBER);
+        if(mobileNumber == null)
+            throw new IllegalArgumentException("mobile number must not be null.");
+        if(localNumber == null)
+            throw new IllegalArgumentException("local number must not be null.");
+
         initView();
     }
 
@@ -97,14 +110,15 @@ public class BluetoothConnectionActivity extends AppCompatActivity {
                     @Override
                     public void onPermissionDenied() {
                         //权限获取失败
-                        Snackbar.make(bottomNavigationView, "Please manually give relevant permissions", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(bottomNavigationView, "Please manually give relevant permissions", Snackbar.LENGTH_LONG)
+                                .setBackgroundTint(getResources().getColor(R.color.white)).show();
                     }
                 });
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new HomeFragment());
+        adapter.addFragment(new HomeFragment(localNumber, mobileNumber));
         adapter.addFragment(new SettingFragment());
         viewPager.setAdapter(adapter);
     }

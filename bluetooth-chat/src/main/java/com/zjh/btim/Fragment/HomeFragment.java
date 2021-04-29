@@ -22,8 +22,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import com.zjh.btim.Activity.ChatActivity;
 import com.zjh.btim.Adapter.ItemBtListAdapter;
 import com.zjh.btim.Bean.BlueToothBean;
 import com.zjh.btim.CallBack.BlueToothInterface;
@@ -31,15 +31,18 @@ import com.zjh.btim.R;
 import com.zjh.btim.Receiver.BluetoothStateBroadcastReceive;
 import com.zjh.btim.Service.BluetoothChatService;
 import com.zjh.btim.Util.BluetoothUtil;
+import com.zjh.btim.model.ConnectionModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Objects;
 
+import static android.app.Activity.RESULT_OK;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_DIALOG;
+import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_READ;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_SUCCESS;
 import static com.zjh.btim.Activity.BluetoothConnectionActivity.BLUE_TOOTH_TOAST;
+import static com.zjh.btim.Activity.BluetoothConnectionActivity.DEVICE_CONNECTION_MODEL;
 
 
 public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
@@ -53,6 +56,16 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private LinearLayout layoutHide;
     private ProgressDialog progressDialog;
     private BluetoothChatService mBluetoothChatService;
+
+    private final String localNumber;
+    private final String mobileNumber;
+    private ConnectionModel connectionModel;
+
+
+    public HomeFragment(String localNumber, String mobileNumber) {
+        this.localNumber = localNumber;
+        this.mobileNumber = mobileNumber;
+    }
 
     private BlueToothInterface blueToothInterface = new BlueToothInterface() {
         @Override
@@ -72,13 +85,10 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         @Override
         public void getConnectedBlueToothDevices(BluetoothDevice device) {
-            Snackbar.make(getView(), "connection with device " + device.getName() + " succeeded.", Snackbar.LENGTH_LONG).show();
-        }
+       }
 
         @Override
-        public void getDisConnectedBlueToothDevices(BluetoothDevice device) {
-            Log.i("zjh-DisConnected", "断开连接");
-            update();
+        public void getDisConnectedBlueToothDevices(BluetoothDevice device) { ;
         }
 
         @Override
@@ -88,15 +98,10 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         @Override
         public void open() {
-            mBluetoothChatService = BluetoothChatService.getInstance(handler);
-            mBluetoothChatService.start();
-            update();
         }
 
         @Override
         public void disable() {
-            mBluetoothChatService.stop();
-            update();
         }
     };
 
@@ -106,35 +111,37 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                //正在连接
                 case BLUE_TOOTH_DIALOG:
                     showProgressDialog((String) msg.obj);
                     break;
-                //连接失败
                 case BLUE_TOOTH_TOAST:
                     dismissProgressDialog();
-                    Snackbar.make(getView(), (String) msg.obj, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getView(), (String) msg.obj, Snackbar.LENGTH_LONG)
+                    .setBackgroundTint(getContext().getResources().getColor(R.color.white)).show();
                     break;
-                //连接成功
+                case BLUE_TOOTH_READ:
+                    dismissProgressDialog();
+                    final String mobileStr = (String) msg.obj;
+
+                    if(mobileStr == null)
+                        throw new IllegalStateException("mobileStr should not be null");
+
+                    if(!mobileStr.equals(mobileNumber)){
+                        Toast.makeText(getContext(), "This device is not the user's device, try another one.", Toast.LENGTH_LONG).show();
+                        break;
+                    }
+
+                    Intent intent = new Intent();
+                    intent.putExtra(DEVICE_CONNECTION_MODEL, connectionModel);
+                    Objects.requireNonNull(getActivity()).setResult(RESULT_OK, intent);
+                    getActivity().finish();
+                    break;
                 case BLUE_TOOTH_SUCCESS:
                     BluetoothDevice remoteDevice = (BluetoothDevice) msg.obj;
-                    dismissProgressDialog();
-                    final Intent intent = new Intent(getContext(), ChatActivity.class);
-                    intent.putExtra(ChatActivity.DEVICE_NAME_INTENT, remoteDevice.getName());
-                    intent.putExtra(ChatActivity.DEVICE_MAC_INTENT, remoteDevice.getAddress());
-                    final ProgressDialog dialog = new ProgressDialog(getContext());
-                    dialog.setMessage("Connection with device " + msg.obj + " succeeded.");
-                    dialog.setCancelable(false);
-                    dialog.show();
-                    Timer timer = new Timer();
-                    TimerTask tast = new TimerTask() {
-                        @Override
-                        public void run() {
-                            dialog.dismiss();
-                            startActivityForResult(intent, 0);
-                        }
-                    };
-                    timer.schedule(tast, 1500);
+                    connectionModel = new ConnectionModel(mobileNumber,
+                            remoteDevice.getAddress(), remoteDevice.getName());
+
+                    mBluetoothChatService.sendData(localNumber);
                     break;
             }
         }
@@ -150,6 +157,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         bluetoothUtil = new BluetoothUtil(getContext());
         layoutSwipeRefresh = view.findViewById(R.id.layout_swipe_refresh);
         layoutSwipeRefresh.setOnRefreshListener(this);
@@ -179,13 +187,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         getContext().registerReceiver(broadcastReceive, intentFilter);
     }
 
-    private void unregisterBluetoothReceiver() {
-        Log.i("zjh", "蓝牙广播监听关闭");
-        if (broadcastReceive != null) {
-            getContext().unregisterReceiver(broadcastReceive);
-            broadcastReceive = null;
-        }
-    }
 
     @Override
     public void onRefresh() {
@@ -215,17 +216,11 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         ShowDialog(bluetoothUtil.getBluetoothDevice(list.get(position).getMac()));
     }
 
-    /**
-     * 蓝牙连接
-     *
-     * @param device
-     */
     private void ShowDialog(final BluetoothDevice device) {
         AlertDialog.Builder ad = new AlertDialog.Builder(this.getActivity());
         ad.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //连接
                 mBluetoothChatService.connectDevice(device);
             }
         });
@@ -241,31 +236,23 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         ad.show();
     }
 
-    /**
-     * 进度对话框
-     *
-     * @param msg
-     */
     public void showProgressDialog(String msg) {
         if (progressDialog == null)
-            progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage(msg + "\nConnection needs to open this application");
+            progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle("Open Signal");
+        progressDialog.setMessage("Connection needs to open Signal App in the opposite device.\n" + msg);
         progressDialog.setCancelable(false);
         progressDialog.setIndeterminate(false);
-        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "cancel", new DialogInterface.OnClickListener() {
+        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 mBluetoothChatService.stop();
-                update();
             }
         });
         progressDialog.show();
     }
 
-    /**
-     * 关闭进度对话框
-     */
     public void dismissProgressDialog() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
@@ -276,15 +263,5 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         update();
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.i("zjh-onDestroy", "Home关闭");
-        super.onDestroy();
-        unregisterBluetoothReceiver();
-        bluetoothUtil.close();
-        if (mBluetoothChatService != null)
-            mBluetoothChatService.stop();
     }
 }

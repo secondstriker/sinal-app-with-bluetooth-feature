@@ -2769,7 +2769,7 @@ public abstract class ConversationActivity extends PassphraseRequiredActivity
         sendMediaMessage(forceSms, expiresIn, false, subscriptionId, initiating);
       } else {
           if(transport.isBluetooth()){
-              sendTextViaBluetooth();
+              sendTextViaBluetooth(message);
           } else {
               sendTextMessage(forceSms, expiresIn, subscriptionId, initiating);
           }
@@ -3802,5 +3802,5 @@ public abstract class ConversationActivity extends PassphraseRequiredActivity
     }
   }
 
-    public abstract void sendTextViaBluetooth();
+    public abstract void sendTextViaBluetooth(String message);
 }
